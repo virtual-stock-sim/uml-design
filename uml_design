@@ -1,0 +1,31 @@
+[Encryption|static encrypt(input:String salt:String):String;static decrypt(input:String salt:String):String]
+
+[Login Credentials|email:String;passwordHash:String;hashSalt:String|validateCredentials(email:String password:String):Boolean;getEmail():String;setPassword(password:String)]->[Encryption]
+
+[Account Type|User;Admin]
+[Account|displayName:String;leaderboardRank:UInt|login(password:String):Boolean;logout();static Get(id:Int or email:String or displayName):Account]
+[Account]++->[Login Credentials]
+[Account]++->[Account Type]
+
+[Leaderboard|static singleton:Leaderboard|private constructor();static instance();static GetTopAccounts(lowerRangeBound:UInt upperRangeBound):Account List;static GetTopStocks(lowerRangeBound:UInt upperRangeBound):Stock List]-.->[Account]
+
+[Server|static singleton:Server;activeUsers:HttpConnection|private constructor();static instance():Server;handleClientRequest()]-.->[Leaderboard]
+
+[Stock Data Cache|static singleton:Stock Data Cache;serverInstance:Server;timer:Timer;cacheLocation:String|private constructor();static instance():Stock Data Cache;updateCache();pushData()]<>->[Server]
+
+[Cache Item|dataCacheInstance:Stock Data Cache;id:Int|abstract commitChanges()]<>->[Stock Data Cache]
+[Stock Data Cache]-.->[Cache Item]
+
+[Stock Data|id:Int;data:String;Get(id:Int or symbol:String):Stock Data]^[Cache Item]
+[Stock|id:Int;symbol:String;currentPrice:BigDecimal;Get(id:Int or Symbol:String):Stock]^[Cache Item]
+[Stock]<>->[Stock Data]
+[Leaderboard]-.->[Stock]
+
+[Transaction Type|Buy;Sell]
+[Transaction|timestamp:Int;cost:BigDecimal]
+[Transaction]++->[Transaction Type]
+[Transaction]<>->[Stock]
+
+[Transaction History]++-0..*      >[Transaction]
+
+[Account]++->[Transaction History]
