@@ -3,7 +3,7 @@
 [Login Credentials|email:String;passwordHash:String;hashSalt:String|validateCredentials(email:String password:String):Boolean;getEmail():String;setPassword(password:String)]->[Encryption]
 
 [Account Type|User;Admin]
-[Account|displayName:String;leaderboardRank:UInt|login(password:String):Boolean;logout();static Get(id:Int or email:String or displayName):Account]
+[Account|displayName:String;bio:String;profilePic:?;leaderboardRank:UInt;stocksFollowed:Stock List|login(password:String):Boolean;logout();static Get(id:Int or email:String or displayName):Account]
 [Account]++->[Login Credentials]
 [Account]++->[Account Type]
 
@@ -22,7 +22,7 @@
 [Leaderboard]-.->[Stock]
 
 [Transaction Type|Buy;Sell]
-[Transaction|timestamp:Int;cost:BigDecimal]
+[Transaction|timestamp:Int;cost:BigDecimal;numShares:Int]
 [Transaction]++->[Transaction Type]
 [Transaction]<>->[Stock]
 
