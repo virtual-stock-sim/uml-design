@@ -3,13 +3,13 @@
 [Login Credentials|email:String;passwordHash:String;hashSalt:String|validateCredentials(email:String password:String):Boolean;getEmail():String;setPassword(password:String)]->[Encryption]
 
 [Account Type|User;Admin]
-[Account|displayName:String;bio:String;profilePic:?;leaderboardRank:UInt;stocksFollowed:Stock List|login(password:String):Boolean;logout();static Get(id:Int or email:String or displayName):Account]
+[Account|uuid:UInt;displayName:String;bio:String;profilePic:?;leaderboardRank:UInt;stocksFollowed:Stock List|login(password:String):Boolean;logout();static Get(id:Int or email:String or displayName):Account]
 [Account]++->[Login Credentials]
 [Account]++->[Account Type]
 
 [Leaderboard|static singleton:Leaderboard|private constructor();static instance();static GetTopAccounts(lowerRangeBound:UInt upperRangeBound):Account List;static GetTopStocks(lowerRangeBound:UInt upperRangeBound):Stock List]-.->[Account]
 
-[Server|static singleton:Server;activeUsers:HttpConnection|private constructor();static instance():Server;handleClientRequest()]-.->[Leaderboard]
+[Server|static singleton:Server;activeUsers:HttpConnection|private constructor();static instance():Server;handleClientRequest(accountUUID:UInt)]-.->[Leaderboard]
 
 [Stock Data Cache|static singleton:Stock Data Cache;serverInstance:Server;timer:Timer;cacheLocation:String|private constructor();static instance():Stock Data Cache;updateCache();pushData()]<>->[Server]
 
@@ -26,6 +26,11 @@
 [Transaction]++->[Transaction Type]
 [Transaction]<>->[Stock]
 
-[Transaction History]++-0..*      >[Transaction]
+[Transaction History|transactions:Transaction List]++-0..*      >[Transaction]
 
 [Account]++->[Transaction History]
+
+[Stock Data Cookie |updateCookie(cookieData:String);getCookie():String;updateStockCookie(stockSymbol:String stockData:String);getStockCookie(stockSymbol:String):String]
+
+[Client|accountUUID:UInt|getAccountInfo(uuid:UInt);onLogin();onLogout();saveCookies(cookieData:String);clearCookies();handleDataUpdate();requestCurrStockPrice(symbol:String);parseCookie();parseIncomingData()]
+[Client]->[Stock Data Cookie ]
