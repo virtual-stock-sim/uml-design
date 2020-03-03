@@ -40,5 +40,5 @@
 
 [Stock Data Cookie |clear();updateAllStocks(cookieData:JSON);getAllStocks():JSON;updateStock(cookieData:JSON);getStock(stockSymbol:String):JSON;requiresUpdate():Boolean]
 
-[Client|accountUUID:UInt|getAccountInfo();JSON;onLoad();onLogin();onLogout();handleDataPush();getUpdatedStockInfo();getCurrStockPrice(symbol:String);getTransactionHistory();]
+[Client|accountUUID:UInt|getAccountInfo();onLoad();onLogin();onLogout();handleDataPush();getUpdatedStockInfo();getCurrStockPrice(symbol:String);getTransactionHistory();]
 [Client]->[Stock Data Cookie ]
