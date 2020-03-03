@@ -1,3 +1,5 @@
+[Parseable|toJSON():JSON]
+
 [Encryption|static encrypt(input:String salt:String):String;static decrypt(input:String salt:String):String]
 
 [Login Credentials|email:String;passwordHash:String;hashSalt:String|validateCredentials(email:String password:String):Boolean;getEmail():String;setPassword(password:String)]->[Encryption]
@@ -6,8 +8,10 @@
 [Account|uuid:UInt;displayName:String;bio:String;profilePic:?;leaderboardRank:UInt;stocksFollowed:Stock List|login(password:String):Boolean;logout();static Get(id:Int or email:String or displayName):Account]
 [Account]++->[Login Credentials]
 [Account]++->[Account Type]
+[Account]^[Parseable]
 
 [Leaderboard|static singleton:Leaderboard|private constructor();static instance();static GetTopAccounts(lowerRangeBound:UInt upperRangeBound):Account List;static GetTopStocks(lowerRangeBound:UInt upperRangeBound):Stock List]-.->[Account]
+[Leaderboard]^[Parseable]
 
 [Server|static singleton:Server;activeUsers:HttpConnection|private constructor();static instance():Server;handleClientRequest(accountUUID:UInt)]-.->[Leaderboard]
 
@@ -15,8 +19,9 @@
 
 [Cache Item|dataCacheInstance:Stock Data Cache;id:Int|abstract commitChanges()]<>->[Stock Data Cache]
 [Stock Data Cache]-.->[Cache Item]
+[Cache Item]^[Parseable]
 
-[Stock Data|id:Int;data:String;Get(id:Int or symbol:String):Stock Data]^[Cache Item]
+[Stock Data|id:Int;data:JSON;Get(id:Int or symbol:String):Stock Data]^[Cache Item]
 [Stock|id:Int;symbol:String;currentPrice:BigDecimal;Get(id:Int or Symbol:String):Stock]^[Cache Item]
 [Stock]<>->[Stock Data]
 [Leaderboard]-.->[Stock]
@@ -25,12 +30,15 @@
 [Transaction|timestamp:Int;cost:BigDecimal;numShares:Int]
 [Transaction]++->[Transaction Type]
 [Transaction]<>->[Stock]
+[Transaction]^[Parseable]
 
-[Transaction History|transactions:Transaction List]++-0..*      >[Transaction]
+[Transaction History|transactions:Transaction List;addTransaction(transaction:Transaction);resetHistory()]++-0..*      >[Transaction]
+[Transaction History]^[Parseable]
 
 [Account]++->[Transaction History]
 
-[Stock Data Cookie |updateCookie(cookieData:String);getCookie():String;updateStockCookie(stockSymbol:String stockData:String);getStockCookie(stockSymbol:String):String]
 
-[Client|accountUUID:UInt|getAccountInfo(uuid:UInt);onLogin();onLogout();saveCookies(cookieData:String);clearCookies();handleDataUpdate();requestCurrStockPrice(symbol:String);parseCookie();parseIncomingData()]
+[Stock Data Cookie |clear();updateAllStocks(cookieData:JSON);getAllStocks():JSON;updateStock(cookieData:JSON);getStock(stockSymbol:String):JSON;requiresUpdate():Boolean]
+
+[Client|accountUUID:UInt|getAccountInfo();JSON;onLoad();onLogin();onLogout();handleDataPush();getUpdatedStockInfo();getCurrStockPrice(symbol:String);getTransactionHistory();]
 [Client]->[Stock Data Cookie ]
